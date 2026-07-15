@@ -291,7 +291,12 @@ const DEFAULTS = {
     {id:"insurance", title:"Public liability insurance confirmed", sub:"", status:"not", notes:""},
     {id:"licence", title:"Licence condition removal", sub:"Track next review date", status:"not", notes:"", reviewDate:""},
   ]},
-  subbies:  { prospects: [] },
+  subbies:  { toSource: [
+    {id:"safety_rail", label:"Safety rail installer", done:false, notes:""},
+    {id:"scaffolder",  label:"Scaffolder", done:false, notes:""},
+    {id:"tipper",      label:"Tipper truck", done:false, notes:""},
+    {id:"skips",       label:"Skip bins", done:false, notes:""},
+  ], prospects: [] },
   builders: { prospects: [] },
   networking: { channels: [
     {id:"bni",      name:"BNI", hint:"Chapter visits, then membership", activities:[], leads:0, notes:"", subTicks:[{label:"Membership joined", done:false}]},
@@ -344,9 +349,16 @@ const fmtMoney = n => "$" + Number(n||0).toLocaleString("en-AU");
 function mergePillar(pillar, data){
   const def = clone(DEFAULTS[pillar]);
   if(!data) return def;
+  if(pillar === "subbies"){                          // fixed sourcing list + dynamic prospects
+    const storedSrc = Array.isArray(data.toSource) ? data.toSource : [];
+    return {
+      toSource: def.toSource.map(d => Object.assign(d, storedSrc.find(x => x.id === d.id) || {})),
+      prospects: Array.isArray(data.prospects) ? data.prospects : [],
+    };
+  }
   const listKey = Object.keys(def)[0];               // items / prospects / channels / members
   const stored = Array.isArray(data[listKey]) ? data[listKey] : [];
-  if(pillar === "subbies" || pillar === "builders"){ // fully dynamic lists
+  if(pillar === "builders"){                         // fully dynamic list
     return { [listKey]: stored };
   }
   const merged = def[listKey].map(d => {
@@ -365,8 +377,10 @@ function pillarProgress(p){
     return v / s.items.length;
   }
   if(p === "subbies"){
-    if(!s.prospects.length) return 0;
-    return s.prospects.reduce((a,i)=> a + (i.stage||0)/SUBBIE_STAGES.length, 0) / s.prospects.length;
+    const units = s.prospects.map(i => (i.stage||0)/SUBBIE_STAGES.length)
+      .concat((s.toSource||[]).map(t => t.done ? 1 : 0));
+    if(!units.length) return 0;
+    return units.reduce((a,b)=>a+b, 0) / units.length;
   }
   if(p === "builders"){
     if(!s.prospects.length) return 0;
@@ -543,6 +557,14 @@ function renderSubbies(){
       <div class="bar"><i style="width:${c.n/max*100}%"></i></div>
       <span class="val">${c.n}</span></div>`).join("")}
   </div>`;
+  const toSource = `<div class="meta-line" style="font-weight:600">Trades &amp; services to source</div>
+    ${(s.toSource||[]).map(t=>`
+    <div class="item">
+      <button class="tick ${t.done?"on":""}" data-action="srctick" data-id="${t.id}">
+        <span class="box"></span><span class="lbl">${esc(t.label)}</span></button>
+      ${notesBox("subbies", t.id, t.notes)}
+    </div>`).join("")}
+    <div class="meta-line" style="font-weight:600;margin-top:14px">Prospects</div>`;
   const rows = s.prospects.length ? s.prospects.map(x=>{
     const ch = SUBBIE_CHANNELS.find(c=>c.id===x.channel);
     return `<div class="item">
@@ -555,7 +577,7 @@ function renderSubbies(){
       ${notesBox("subbies", x.id, x.notes)}
     </div>`;
   }).join("") : `<div class="empty">No subbie prospects yet — add your first below.</div>`;
-  return bars + rows + `
+  return bars + toSource + rows + `
     <button class="add-btn" data-action="toggle-form" data-form="subbieForm">+ Add subbie prospect</button>
     <form class="add-form" id="subbieForm">
       <div class="two"><input type="text" name="name" placeholder="Name" required><input type="tel" name="phone" placeholder="Phone"></div>
@@ -697,7 +719,7 @@ function autoGrow(t){ t.style.height = "auto"; t.style.height = t.scrollHeight +
 function findItem(pillar, id){
   const s = state[pillar];
   const list = s.items || s.prospects || s.channels || s.members;
-  return list.find(x => x.id === id);
+  return list.find(x => x.id === id) || (s.toSource || []).find(x => x.id === id);
 }
 
 document.addEventListener("click", e => {
@@ -778,6 +800,12 @@ document.addEventListener("click", e => {
     const it = findItem("networking", btn.dataset.id);
     it.activities.splice(+btn.dataset.idx, 1);
     save("networking"); render("networking"); updateProgress(); return;
+  }
+
+  if(a === "srctick"){
+    const it = findItem("subbies", id);
+    it.done = !it.done;
+    save("subbies"); render("subbies"); updateProgress(); return;
   }
 
   if(a === "mtick"){

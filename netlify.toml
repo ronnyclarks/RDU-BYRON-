@@ -1,0 +1,3 @@
+[build]
+  # Single static HTML file — no build step
+  publish = "."

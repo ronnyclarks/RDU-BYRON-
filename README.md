@@ -11,7 +11,8 @@ Single-file dashboard tracking Roofing Down Under's relocation to the Northern N
      allow read, write: if request.auth != null;
    }
    ```
-3. **Deploy via GitHub Pages.** Repo Settings → Pages → deploy from the branch containing `index.html` (root). No build step.
+3. **Deploy via Netlify.** In Netlify: *Add new site → Import an existing project → GitHub → pick this repo*. Leave the build command empty (a `netlify.toml` is included that publishes the repo root — no build step). Every push then auto-deploys.
+4. **Authorise the Netlify domain.** In the Firebase console → Authentication → Settings → Authorized domains, add your Netlify site domain (e.g. `your-site.netlify.app`, plus any custom domain) or sign-in will be blocked.
 
 ## Notes
 
