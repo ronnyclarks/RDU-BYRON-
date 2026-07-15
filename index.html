@@ -35,33 +35,19 @@
   }
   button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;-webkit-tap-highlight-color:transparent}
   input,textarea,select{font:inherit;color:var(--ink)}
-  input[type=text],input[type=tel],input[type=number],input[type=date],input[type=email],input[type=password],select,textarea{
+  input[type=text],input[type=tel],input[type=number],input[type=date],select,textarea{
     width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:#fff;
   }
   input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
   textarea{resize:none;overflow:hidden;min-height:38px}
   ::placeholder{color:var(--ink3)}
 
-  /* ---------- login ---------- */
-  #loginScreen{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px;
-    background:linear-gradient(160deg,var(--brand) 0%,var(--brand-2) 100%)}
-  .login-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 24px;width:100%;max-width:380px}
-  .login-card h1{font-size:20px;margin-bottom:2px}
-  .login-card .sub{color:var(--ink2);font-size:14px;margin-bottom:20px}
-  .login-card label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:12px 0 5px}
-  .login-card .btn-primary{width:100%;margin-top:18px}
-  #loginError{color:#B3261E;font-size:13px;margin-top:12px;display:none}
-  #setupNotice{display:none;background:var(--warn-soft);border:1px solid #EAD9B8;border-radius:8px;padding:12px;font-size:13px;color:var(--ink);margin-bottom:16px}
-  #setupNotice code{background:#fff;padding:1px 5px;border-radius:4px;font-size:12px}
-
   .btn-primary{background:var(--accent);color:#fff;font-weight:600;border-radius:9px;padding:12px 16px}
   .btn-primary:active{filter:brightness(.92)}
-  .btn-primary[disabled]{opacity:.6;cursor:default}
   .btn-ghost{border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink2);background:#fff}
   .btn-ghost:active{background:var(--muted-soft)}
 
   /* ---------- app shell ---------- */
-  #app{display:none}
   header.appbar{
     background:linear-gradient(160deg,var(--brand) 0%,var(--brand-2) 100%);
     color:#fff;padding:16px 16px 20px;padding-top:calc(16px + env(safe-area-inset-top));
@@ -69,11 +55,8 @@
   .appbar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:960px;margin:0 auto}
   .appbar h1{font-size:17px;font-weight:700;letter-spacing:.2px}
   .appbar .tag{font-size:12px;color:rgba(255,255,255,.75);display:block;font-weight:500}
-  .appbar-actions{display:flex;align-items:center;gap:10px}
-  #syncDot{width:9px;height:9px;border-radius:50%;background:#7BC297;flex:none;transition:background .2s}
-  #syncDot.saving{background:#F2B84B}
-  #syncDot.error{background:#E5695B}
-  #signOutBtn{border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 11px;font-size:13px;font-weight:600}
+  .appbar-actions{display:flex;align-items:center;gap:8px}
+  .appbar-actions button{border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:600}
 
   .overall{max-width:960px;margin:14px auto 0}
   .overall .row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:rgba(255,255,255,.85);margin-bottom:6px}
@@ -139,7 +122,7 @@
   .chan-bars{display:grid;gap:7px;margin:4px 0 12px}
   .chan-bar{display:grid;grid-template-columns:118px 1fr 28px;align-items:center;gap:8px;font-size:12.5px}
   .chan-bar .lbl{color:var(--ink2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .chan-bar .bar{height:14px;border-radius:4px 4px 4px 4px;background:var(--muted-soft);overflow:hidden}
+  .chan-bar .bar{height:14px;border-radius:4px;background:var(--muted-soft);overflow:hidden}
   .chan-bar .bar i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0;transition:width .3s}
   .chan-bar .val{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
 
@@ -202,25 +185,6 @@
 </head>
 <body>
 
-<!-- ============ LOGIN ============ -->
-<div id="loginScreen">
-  <form class="login-card" id="loginForm">
-    <h1>🏠 Byron Expansion</h1>
-    <div class="sub">Roofing Down Under · team dashboard</div>
-    <div id="setupNotice">
-      <b>Setup needed:</b> paste your Firebase config from the rdudashboard project into the
-      <code>firebaseConfig</code> block near the top of the <code>&lt;script&gt;</code> in this file, then redeploy.
-    </div>
-    <label for="loginEmail">Email</label>
-    <input type="email" id="loginEmail" autocomplete="username" required>
-    <label for="loginPassword">Password</label>
-    <input type="password" id="loginPassword" autocomplete="current-password" required>
-    <button class="btn-primary" id="loginBtn" type="submit">Sign in</button>
-    <div id="loginError"></div>
-  </form>
-</div>
-
-<!-- ============ APP ============ -->
 <div id="app">
   <header class="appbar">
     <div class="appbar-row">
@@ -229,8 +193,9 @@
         <span class="tag">Northern NSW corridor · Byron → QLD border</span>
       </div>
       <div class="appbar-actions">
-        <div id="syncDot" title="Sync status"></div>
-        <button id="signOutBtn">Sign out</button>
+        <button id="exportBtn" title="Download a backup file of this board">Backup</button>
+        <button id="importBtn" title="Restore from a backup file">Restore</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
       </div>
     </div>
     <div class="overall">
@@ -246,29 +211,11 @@
 
 <div id="toast">Saved ✓</div>
 
-<script type="module">
-/* =====================================================================
-   FIREBASE CONFIG — PASTE YOURS HERE
-   Copy the firebaseConfig object from any page in your rdudashboard
-   repo (same Firebase project = same logins work here).
-   ===================================================================== */
-const firebaseConfig = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_AUTH_DOMAIN",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_STORAGE_BUCKET",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID"
-};
-/* ===================================================================== */
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, onSnapshot }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const COLLECTION = "byronExpansion";
+<script>
+"use strict";
+/* Data lives in this browser (localStorage) — no accounts, no server.
+   Use Backup/Restore in the header to move it between devices. */
+const STORE_KEY = "byronExpansion";
 const PILLARS = ["milestones","subbies","builders","networking","team","marketing","social"];
 
 const SUBBIE_CHANNELS = [
@@ -331,11 +278,7 @@ const DEFAULTS = {
 
 /* ---------------- state ---------------- */
 let state = {};
-let db, auth, user = null;
-const unsubs = [];
 const saveTimers = {};
-let savingCount = 0;
-const pendingRemote = {};
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -417,55 +360,30 @@ function updateProgress(){
   $("#overallFill").style.width = overall + "%";
 }
 
-/* ---------------- persistence ---------------- */
-function setSync(cls){ const d = $("#syncDot"); d.className = cls || ""; }
+/* ---------------- persistence (this browser) ---------------- */
 function toast(msg, err){
   const t = $("#toast");
   t.textContent = msg; t.className = "show" + (err ? " err" : "");
   clearTimeout(t._h); t._h = setTimeout(()=> t.className = "", 1400);
 }
-async function save(pillar){
-  if(!user) return;
-  savingCount++; setSync("saving");
+function save(){
   try{
-    await setDoc(doc(db, COLLECTION, pillar), state[pillar]);
-    savingCount--;
-    if(savingCount<=0){ savingCount=0; setSync(""); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
     toast("Saved ✓");
   }catch(e){
-    savingCount--; setSync("error");
-    toast("Save failed — check connection", true);
     console.error(e);
+    toast("Save failed — storage full or blocked", true);
   }
 }
-function saveDebounced(pillar){
-  clearTimeout(saveTimers[pillar]);
-  setSync("saving");
-  saveTimers[pillar] = setTimeout(()=> save(pillar), 700);
+function saveDebounced(){
+  clearTimeout(saveTimers.t);
+  saveTimers.t = setTimeout(save, 500);
 }
-function isEditing(){
-  const el = document.activeElement;
-  return el && (el.tagName==="TEXTAREA" || el.tagName==="INPUT" || el.tagName==="SELECT") && $("#main").contains(el);
-}
-function subscribeAll(){
-  for(const p of PILLARS){
-    unsubs.push(onSnapshot(doc(db, COLLECTION, p), snap => {
-      if(snap.metadata.hasPendingWrites) return;         // our own write echoing back
-      const merged = mergePillar(p, snap.exists() ? snap.data() : null);
-      if(isEditing()){ pendingRemote[p] = merged; return; } // don't stomp on typing
-      state[p] = merged;
-      render(p); updateProgress();
-    }, e => { console.error(e); setSync("error"); toast("Sync error — check Firestore rules", true); }));
-  }
-  // apply deferred remote updates once the user stops editing
-  document.addEventListener("focusout", ()=> setTimeout(()=>{
-    if(isEditing()) return;
-    for(const p of Object.keys(pendingRemote)){
-      state[p] = pendingRemote[p]; delete pendingRemote[p];
-      render(p);
-    }
-    updateProgress();
-  }, 60));
+function load(){
+  let data = null;
+  try{ data = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); }catch(e){ console.error(e); }
+  state = {};
+  for(const p of PILLARS) state[p] = mergePillar(p, data ? data[p] : null);
 }
 
 /* ---------------- render helpers ---------------- */
@@ -738,11 +656,11 @@ document.addEventListener("click", e => {
     if(a === "add-subbie"){
       state.subbies.prospects.push({id:uid(), name:f.get("name").trim(), phone:String(f.get("phone")||"").trim(),
         trade:String(f.get("trade")||"").trim(), channel:f.get("channel"), stage:0, notes:""});
-      save("subbies"); render("subbies");
+      save(); render("subbies");
     }else{
       state.builders.prospects.push({id:uid(), name:f.get("name").trim(), company:String(f.get("company")||"").trim(),
         source:String(f.get("source")||"").trim(), hwi:form.querySelector("[name=hwi]").checked, stage:0, notes:""});
-      save("builders"); render("builders");
+      save(); render("builders");
     }
     updateProgress(); return;
   }
@@ -752,38 +670,38 @@ document.addEventListener("click", e => {
     if(!confirm(`Delete "${it?.name || "this item"}"?`)) return;
     const s = state[pillar];
     s.prospects = s.prospects.filter(x=>x.id!==id);
-    save(pillar); render(pillar); updateProgress(); return;
+    save(); render(pillar); updateProgress(); return;
   }
 
   if(a === "status"){
     findItem("milestones", id).status = btn.dataset.v;
-    save("milestones"); render("milestones"); updateProgress(); return;
+    save(); render("milestones"); updateProgress(); return;
   }
 
   if(a === "stage"){
     const it = findItem(pillar, id);
     const idx = +btn.dataset.idx;
     it.stage = (it.stage === idx) ? idx - 1 : idx;   // tap current stage to step back
-    save(pillar); render(pillar); updateProgress(); return;
+    save(); render(pillar); updateProgress(); return;
   }
 
   if(a === "count"){
     const it = findItem(pillar, id);
     const f = btn.dataset.field;
     it[f] = Math.max(0, (it[f]||0) + (+btn.dataset.d));
-    save(pillar); render(pillar); updateProgress(); return;
+    save(); render(pillar); updateProgress(); return;
   }
 
   if(a === "toggle-hwi"){
     const it = findItem("builders", id);
     it.hwi = !it.hwi;
-    save("builders"); render("builders"); return;
+    save(); render("builders"); return;
   }
 
   if(a === "subtick"){
     const it = findItem("networking", id);
     it.subTicks[+btn.dataset.idx].done = !it.subTicks[+btn.dataset.idx].done;
-    save("networking"); render("networking"); updateProgress(); return;
+    save(); render("networking"); updateProgress(); return;
   }
 
   if(a === "log-activity"){
@@ -793,31 +711,31 @@ document.addEventListener("click", e => {
     const label = $(`#actLabel-${id}`).value.trim();
     it.activities = it.activities || [];
     it.activities.push({date, label});
-    save("networking"); render("networking"); updateProgress(); return;
+    save(); render("networking"); updateProgress(); return;
   }
 
   if(a === "del-activity"){
     const it = findItem("networking", btn.dataset.id);
     it.activities.splice(+btn.dataset.idx, 1);
-    save("networking"); render("networking"); updateProgress(); return;
+    save(); render("networking"); updateProgress(); return;
   }
 
   if(a === "srctick"){
     const it = findItem("subbies", id);
     it.done = !it.done;
-    save("subbies"); render("subbies"); updateProgress(); return;
+    save(); render("subbies"); updateProgress(); return;
   }
 
   if(a === "mtick"){
     const it = findItem("marketing", id);
     it.done = !it.done;
-    save("marketing"); render("marketing"); updateProgress(); return;
+    save(); render("marketing"); updateProgress(); return;
   }
 
   if(a === "stick"){
     const it = findItem("social", id);
     it[btn.dataset.field] = !it[btn.dataset.field];
-    save("social"); render("social"); updateProgress(); return;
+    save(); render("social"); updateProgress(); return;
   }
 });
 
@@ -842,7 +760,7 @@ document.addEventListener("input", e => {
   } else {
     it[field] = el.value;
   }
-  saveDebounced(el.dataset.pillar);
+  saveDebounced();
 });
 
 /* label-wrapped checkbox in builder add-form (visual only) */
@@ -851,49 +769,42 @@ document.addEventListener("change", e => {
   if(cb) cb.closest(".tick").classList.toggle("on", cb.checked);
 });
 
-/* ---------------- auth + boot ---------------- */
-function boot(){
-  if(firebaseConfig.apiKey.startsWith("PASTE")){
-    $("#setupNotice").style.display = "block";
-    $("#loginBtn").disabled = true;
-    return;
-  }
-  const app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-
-  onAuthStateChanged(auth, u => {
-    user = u;
-    if(u){
-      $("#loginScreen").style.display = "none";
-      $("#app").style.display = "block";
-      state = {}; for(const p of PILLARS) state[p] = mergePillar(p, null);
-      renderAll();
-      subscribeAll();
-    }else{
-      unsubs.forEach(fn=>fn()); unsubs.length = 0;
-      $("#app").style.display = "none";
-      $("#loginScreen").style.display = "flex";
-    }
-  });
-
-  $("#loginForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const btn = $("#loginBtn"), err = $("#loginError");
-    btn.disabled = true; btn.textContent = "Signing in…"; err.style.display = "none";
+/* ---------------- backup / restore ---------------- */
+$("#exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `byron-expansion-backup-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Backup downloaded ✓");
+});
+$("#importBtn").addEventListener("click", () => $("#importFile").click());
+$("#importFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
     try{
-      await signInWithEmailAndPassword(auth, $("#loginEmail").value.trim(), $("#loginPassword").value);
-    }catch(ex){
-      err.textContent = ex.code === "auth/invalid-credential" || ex.code === "auth/wrong-password" || ex.code === "auth/user-not-found"
-        ? "Wrong email or password." : "Sign-in failed: " + (ex.code || ex.message);
-      err.style.display = "block";
+      const data = JSON.parse(reader.result);
+      if(!data || typeof data !== "object") throw new Error("bad file");
+      if(!confirm("Replace everything on this board with the backup?")) return;
+      state = {};
+      for(const p of PILLARS) state[p] = mergePillar(p, data[p] || null);
+      save(); renderAll();
+      toast("Backup restored ✓");
+    }catch(err){
+      console.error(err);
+      toast("That file isn't a valid backup", true);
     }
-    btn.disabled = false; btn.textContent = "Sign in";
-  });
+  };
+  reader.readAsText(file);
+});
 
-  $("#signOutBtn").addEventListener("click", ()=> signOut(auth));
-}
-boot();
+/* ---------------- boot ---------------- */
+load();
+renderAll();
 </script>
 </body>
 </html>
