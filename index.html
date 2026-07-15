@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#16324A">
+<title>Byron Expansion · Roofing Down Under</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%A0%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#F2F5F8;
+    --card:#FFFFFF;
+    --ink:#17242F;
+    --ink2:#5A6B7A;
+    --ink3:#8A97A3;
+    --line:#E3E9EF;
+    --brand:#16324A;
+    --brand-2:#0F2437;
+    --accent:#D9581C;
+    --accent-soft:#FBEAE1;
+    --good:#1F7A44;
+    --good-soft:#E4F3EA;
+    --warn:#B26A00;
+    --warn-soft:#FBF0DC;
+    --muted-soft:#EEF1F4;
+    --radius:14px;
+    --shadow:0 1px 3px rgba(23,36,47,.08), 0 4px 14px rgba(23,36,47,.05);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.45;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;-webkit-tap-highlight-color:transparent}
+  input,textarea,select{font:inherit;color:var(--ink)}
+  input[type=text],input[type=tel],input[type=number],input[type=date],input[type=email],input[type=password],select,textarea{
+    width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:#fff;
+  }
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+  textarea{resize:none;overflow:hidden;min-height:38px}
+  ::placeholder{color:var(--ink3)}
+
+  /* ---------- login ---------- */
+  #loginScreen{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:linear-gradient(160deg,var(--brand) 0%,var(--brand-2) 100%)}
+  .login-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 24px;width:100%;max-width:380px}
+  .login-card h1{font-size:20px;margin-bottom:2px}
+  .login-card .sub{color:var(--ink2);font-size:14px;margin-bottom:20px}
+  .login-card label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:12px 0 5px}
+  .login-card .btn-primary{width:100%;margin-top:18px}
+  #loginError{color:#B3261E;font-size:13px;margin-top:12px;display:none}
+  #setupNotice{display:none;background:var(--warn-soft);border:1px solid #EAD9B8;border-radius:8px;padding:12px;font-size:13px;color:var(--ink);margin-bottom:16px}
+  #setupNotice code{background:#fff;padding:1px 5px;border-radius:4px;font-size:12px}
+
+  .btn-primary{background:var(--accent);color:#fff;font-weight:600;border-radius:9px;padding:12px 16px}
+  .btn-primary:active{filter:brightness(.92)}
+  .btn-primary[disabled]{opacity:.6;cursor:default}
+  .btn-ghost{border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink2);background:#fff}
+  .btn-ghost:active{background:var(--muted-soft)}
+
+  /* ---------- app shell ---------- */
+  #app{display:none}
+  header.appbar{
+    background:linear-gradient(160deg,var(--brand) 0%,var(--brand-2) 100%);
+    color:#fff;padding:16px 16px 20px;padding-top:calc(16px + env(safe-area-inset-top));
+  }
+  .appbar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:960px;margin:0 auto}
+  .appbar h1{font-size:17px;font-weight:700;letter-spacing:.2px}
+  .appbar .tag{font-size:12px;color:rgba(255,255,255,.75);display:block;font-weight:500}
+  .appbar-actions{display:flex;align-items:center;gap:10px}
+  #syncDot{width:9px;height:9px;border-radius:50%;background:#7BC297;flex:none;transition:background .2s}
+  #syncDot.saving{background:#F2B84B}
+  #syncDot.error{background:#E5695B}
+  #signOutBtn{border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 11px;font-size:13px;font-weight:600}
+
+  .overall{max-width:960px;margin:14px auto 0}
+  .overall .row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:rgba(255,255,255,.85);margin-bottom:6px}
+  .overall .pct{font-size:22px;font-weight:700;color:#fff}
+  .track{height:10px;border-radius:5px;background:rgba(255,255,255,.18);overflow:hidden}
+  .track .fill{height:100%;border-radius:5px;background:var(--accent);transition:width .35s ease;min-width:0}
+
+  main{max-width:960px;margin:0 auto;padding:14px 12px 60px;display:grid;gap:14px}
+  @media(min-width:880px){main{grid-template-columns:1fr 1fr;align-items:start}}
+
+  /* ---------- cards ---------- */
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 14px}
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+  .card-head h2{font-size:15.5px;display:flex;align-items:center;gap:8px}
+  .card-head .num{width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:700;
+    display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .card-pct{font-size:13px;font-weight:700;color:var(--ink2);flex:none}
+  .card .track{height:6px;background:var(--muted-soft);margin:6px 0 14px}
+  .card .track .fill{background:var(--accent)}
+
+  .item{border-top:1px solid var(--line);padding:12px 0}
+  .item:last-child{padding-bottom:2px}
+  .item-title{font-weight:600;font-size:14.5px}
+  .item-sub{font-size:12.5px;color:var(--ink2);margin-top:1px}
+  .item-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .notes{margin-top:8px}
+  .notes textarea{font-size:13px;padding:7px 9px;background:#FBFCFD}
+
+  /* status segments (milestones) */
+  .seg{display:flex;gap:5px;margin-top:9px}
+  .seg button{flex:1;border:1px solid var(--line);border-radius:8px;padding:7px 4px;font-size:12px;font-weight:600;color:var(--ink2);background:#fff}
+  .seg button.on-not{background:var(--muted-soft);border-color:var(--ink3);color:var(--ink)}
+  .seg button.on-prog{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+  .seg button.on-done{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+
+  /* stage pills (pipelines) */
+  .stages{display:flex;gap:4px;margin-top:9px;flex-wrap:wrap}
+  .stages button{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--ink2);background:#fff}
+  .stages button.done{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+  .stages button.done::before{content:"✓ ";font-weight:700}
+
+  /* timeline */
+  .timeline .item{position:relative;padding-left:26px;border-top:none}
+  .timeline .item::before{content:"";position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--line)}
+  .timeline .item:first-child::before{top:18px}
+  .timeline .item:last-child::before{bottom:auto;height:18px}
+  .timeline .dot{position:absolute;left:1px;top:14px;width:14px;height:14px;border-radius:50%;
+    border:3px solid var(--ink3);background:#fff;z-index:1}
+  .timeline .dot.prog{border-color:var(--warn);background:var(--warn-soft)}
+  .timeline .dot.done{border-color:var(--good);background:var(--good)}
+
+  .field-inline{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:13px}
+  .field-inline label{font-weight:600;color:var(--ink2);flex:none;font-size:12.5px}
+  .field-inline input{width:auto;flex:1;min-width:0;padding:7px 9px;font-size:13px}
+  .field-inline .prefix{position:relative;flex:1;display:flex;align-items:center}
+  .field-inline .prefix span{position:absolute;left:9px;color:var(--ink2);font-size:13px}
+  .field-inline .prefix input{width:100%;padding-left:22px}
+  .mini-track{height:5px;border-radius:3px;background:var(--muted-soft);overflow:hidden;margin-top:7px}
+  .mini-track .fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
+  .mini-meta{font-size:12px;color:var(--ink2);margin-top:4px}
+
+  /* channel summary bars */
+  .chan-bars{display:grid;gap:7px;margin:4px 0 12px}
+  .chan-bar{display:grid;grid-template-columns:118px 1fr 28px;align-items:center;gap:8px;font-size:12.5px}
+  .chan-bar .lbl{color:var(--ink2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chan-bar .bar{height:14px;border-radius:4px 4px 4px 4px;background:var(--muted-soft);overflow:hidden}
+  .chan-bar .bar i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0;transition:width .3s}
+  .chan-bar .val{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+
+  .pinned{background:var(--accent-soft);border:1px solid #F0CDB8;border-radius:9px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+  .pinned b{color:var(--accent)}
+
+  .meta-line{font-size:12.5px;color:var(--ink2);margin-top:2px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--muted-soft);color:var(--ink2)}
+  .badge.good{background:var(--good-soft);color:var(--good)}
+
+  /* checkboxes */
+  .tick{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .tick .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--ink3);flex:none;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:15px;font-weight:800;transition:all .15s;background:#fff}
+  .tick.on .box{background:var(--good);border-color:var(--good)}
+  .tick .box::after{content:"✓";opacity:0}
+  .tick.on .box::after{opacity:1}
+  .tick span.lbl{font-size:14px;font-weight:600}
+  .tick.small .box{width:20px;height:20px;font-size:12px;border-radius:6px}
+  .tick.small span.lbl{font-size:13px;font-weight:600;color:var(--ink2)}
+  .subticks{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+
+  /* counters */
+  .counter{display:inline-flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+  .counter button{width:36px;height:34px;font-size:18px;font-weight:700;color:var(--ink2);display:flex;align-items:center;justify-content:center}
+  .counter button:active{background:var(--muted-soft)}
+  .counter .val{min-width:34px;text-align:center;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+  .counter-wrap{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:12.5px}
+  .counter-wrap .clbl{font-weight:600;color:var(--ink2)}
+
+  /* activity chips */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--muted-soft);border-radius:999px;padding:4px 6px 4px 10px;font-size:12px;font-weight:600;color:var(--ink2)}
+  .chip .x{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink3)}
+  .chip .x:active{background:#dde3e9}
+  .add-inline{display:flex;gap:6px;margin-top:9px}
+  .add-inline input[type=date]{flex:none;width:135px;padding:7px 8px;font-size:13px}
+  .add-inline input[type=text]{flex:1;min-width:0;padding:7px 9px;font-size:13px}
+  .add-inline button{flex:none}
+
+  /* add prospect forms */
+  .add-form{display:none;border:1px dashed var(--line);border-radius:10px;padding:12px;margin-top:12px;gap:8px}
+  .add-form.open{display:grid}
+  .add-form .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .add-btn{width:100%;margin-top:12px;border:1px dashed var(--ink3);border-radius:10px;padding:11px;font-size:14px;font-weight:600;color:var(--ink2);background:transparent}
+  .add-btn:active{background:var(--muted-soft)}
+
+  .del{color:var(--ink3);font-size:17px;padding:4px 8px;flex:none;line-height:1}
+  .del:active{color:#B3261E}
+
+  .empty{color:var(--ink3);font-size:13px;text-align:center;padding:14px 0 6px}
+
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:999px;opacity:0;
+    pointer-events:none;transition:all .25s;z-index:99;white-space:nowrap}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast.err{background:#B3261E}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginScreen">
+  <form class="login-card" id="loginForm">
+    <h1>🏠 Byron Expansion</h1>
+    <div class="sub">Roofing Down Under · team dashboard</div>
+    <div id="setupNotice">
+      <b>Setup needed:</b> paste your Firebase config from the rdudashboard project into the
+      <code>firebaseConfig</code> block near the top of the <code>&lt;script&gt;</code> in this file, then redeploy.
+    </div>
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" autocomplete="username" required>
+    <label for="loginPassword">Password</label>
+    <input type="password" id="loginPassword" autocomplete="current-password" required>
+    <button class="btn-primary" id="loginBtn" type="submit">Sign in</button>
+    <div id="loginError"></div>
+  </form>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <header class="appbar">
+    <div class="appbar-row">
+      <div>
+        <h1>🏠 Byron Expansion</h1>
+        <span class="tag">Northern NSW corridor · Byron → QLD border</span>
+      </div>
+      <div class="appbar-actions">
+        <div id="syncDot" title="Sync status"></div>
+        <button id="signOutBtn">Sign out</button>
+      </div>
+    </div>
+    <div class="overall">
+      <div class="row">
+        <span>Overall progress · 7 pillars</span>
+        <span class="pct" id="overallPct">0%</span>
+      </div>
+      <div class="track"><div class="fill" id="overallFill" style="width:0%"></div></div>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<div id="toast">Saved ✓</div>
+
+<script type="module">
+/* =====================================================================
+   FIREBASE CONFIG — PASTE YOURS HERE
+   Copy the firebaseConfig object from any page in your rdudashboard
+   repo (same Firebase project = same logins work here).
+   ===================================================================== */
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY",
+  authDomain: "PASTE_AUTH_DOMAIN",
+  projectId: "PASTE_PROJECT_ID",
+  storageBucket: "PASTE_STORAGE_BUCKET",
+  messagingSenderId: "PASTE_SENDER_ID",
+  appId: "PASTE_APP_ID"
+};
+/* ===================================================================== */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const COLLECTION = "byronExpansion";
+const PILLARS = ["milestones","subbies","builders","networking","team","marketing","social"];
+
+const SUBBIE_CHANNELS = [
+  {id:"google",   name:"Google"},
+  {id:"bni",      name:"BNI"},
+  {id:"gumtree",  name:"Gumtree"},
+  {id:"airtasker",name:"Airtasker"},
+];
+const SUBBIE_STAGES  = ["Contacted","Chatted","Trial job","Reliable"];
+const BUILDER_STAGES = ["Identified","Contacted","Met","Discussing terms","Partnered"];
+const TEAM_STAGES    = ["Identified","Contacted","Trial","Locked in"];
+
+/* ---------------- default data (first run) ---------------- */
+const DEFAULTS = {
+  milestones: { items: [
+    {id:"cash",    title:"Stack cash in Sydney", sub:"Now → Christmas", status:"not", notes:"", tally:0, target:0},
+    {id:"rental",  title:"Rental secured — me + partner", sub:"Target Nov/Dec · goal: 6 months rent buffered", status:"not", notes:"", bufferMonths:0},
+    {id:"lease",   title:"Sydney lease ends", sub:"December", status:"not", notes:""},
+    {id:"bni",     title:"Join BNI in the region", sub:"January · chapter whose referrals land NSW-side (Tweed/Byron, not QLD)", status:"not", notes:""},
+    {id:"insurance", title:"Public liability insurance confirmed", sub:"", status:"not", notes:""},
+    {id:"licence", title:"Licence condition removal", sub:"Track next review date", status:"not", notes:"", reviewDate:""},
+  ]},
+  subbies:  { prospects: [] },
+  builders: { prospects: [] },
+  networking: { channels: [
+    {id:"bni",      name:"BNI", hint:"Chapter visits, then membership", activities:[], leads:0, notes:"", subTicks:[{label:"Membership joined", done:false}]},
+    {id:"chamber",  name:"Chamber of commerce", hint:"", activities:[], leads:0, notes:"", subTicks:[]},
+    {id:"hia",      name:"HIA / MBA events", hint:"", activities:[], leads:0, notes:"", subTicks:[]},
+    {id:"meetups",  name:"Local trade meetups", hint:"", activities:[], leads:0, notes:"", subTicks:[]},
+    {id:"cold_builders", name:"Cold calls — builders", hint:"", activities:[], leads:0, notes:"", subTicks:[]},
+    {id:"cold_pm",  name:"Cold calls — property managers", hint:"Real estate PMs", activities:[], leads:0, notes:"", subTicks:[]},
+    {id:"letterbox",name:"Letterbox drops", hint:"Log suburb with each drop", activities:[], leads:0, notes:"", subTicks:[], labelHint:"Suburb"},
+    {id:"signage",  name:"Signage", hint:"Log site signs per job", activities:[], leads:0, notes:"", subTicks:[{label:"Ute signage done", done:false}], labelHint:"Job / site"},
+    {id:"uniform",  name:"Uniform", hint:"Branded gear", activities:[], leads:0, notes:"", subTicks:[{label:"Branded gear ordered", done:false},{label:"Worn on jobs", done:false}]},
+  ]},
+  team: { members: [
+    {id:"bookkeeper", role:"Local bookkeeper", hint:"Find via BNI", name:"", stage:0, notes:""},
+    {id:"va",         role:"New VA", hint:"Find via BNI", name:"", stage:0, notes:""},
+    {id:"lauren",     role:"Lead generation — Lauren", hint:"Prospecting activity + leads booked for the new area", name:"Lauren", stage:0, notes:"", activity:0, leadsBooked:0},
+  ]},
+  marketing: { items: [
+    {id:"website",  title:"Website updated with new service area", done:false, notes:""},
+    {id:"gbp",      title:"Google Business profile updated to new region", done:false, notes:""},
+    {id:"whatsapp", title:"WhatsApp Business profile updated", done:false, notes:""},
+    {id:"bni",      title:"BNI listing ready", done:false, notes:""},
+    {id:"flyer",    title:"One-pager / flyer designed and printed", done:false, notes:""},
+  ]},
+  social: { items: [
+    {id:"football", title:"Football club", sub:"Sign up ~Jan/Feb pre-season", targetDate:"", joined:false, firstSession:false, notes:""},
+    {id:"music",    title:"Music scene", sub:"Jam nights / open mics", targetDate:"", joined:false, firstSession:false, notes:""},
+    {id:"comedy",   title:"Stand-up comedy open mics", sub:"", targetDate:"", joined:false, firstSession:false, notes:""},
+    {id:"partner",  title:"Partner's social activity", sub:"", targetDate:"", joined:false, firstSession:false, notes:""},
+  ]},
+};
+
+/* ---------------- state ---------------- */
+let state = {};
+let db, auth, user = null;
+const unsubs = [];
+const saveTimers = {};
+let savingCount = 0;
+const pendingRemote = {};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const clone = o => JSON.parse(JSON.stringify(o));
+const todayISO = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const fmtDate = iso => { if(!iso) return ""; const [y,m,d]=iso.split("-"); return `${d}/${m}/${y.slice(2)}`; };
+const fmtMoney = n => "$" + Number(n||0).toLocaleString("en-AU");
+
+/* merge stored data over defaults so fixed rows survive schema tweaks */
+function mergePillar(pillar, data){
+  const def = clone(DEFAULTS[pillar]);
+  if(!data) return def;
+  const listKey = Object.keys(def)[0];               // items / prospects / channels / members
+  const stored = Array.isArray(data[listKey]) ? data[listKey] : [];
+  if(pillar === "subbies" || pillar === "builders"){ // fully dynamic lists
+    return { [listKey]: stored };
+  }
+  const merged = def[listKey].map(d => {
+    const s = stored.find(x => x.id === d.id);
+    return s ? Object.assign(d, s) : d;
+  });
+  return { [listKey]: merged };
+}
+
+/* ---------------- progress ---------------- */
+function pillarProgress(p){
+  const s = state[p];
+  if(!s) return 0;
+  if(p === "milestones"){
+    const v = s.items.reduce((a,i)=> a + (i.status==="done"?1:i.status==="prog"?0.5:0), 0);
+    return v / s.items.length;
+  }
+  if(p === "subbies"){
+    if(!s.prospects.length) return 0;
+    return s.prospects.reduce((a,i)=> a + (i.stage||0)/SUBBIE_STAGES.length, 0) / s.prospects.length;
+  }
+  if(p === "builders"){
+    if(!s.prospects.length) return 0;
+    return Math.max(...s.prospects.map(i => (i.stage||0)/BUILDER_STAGES.length));
+  }
+  if(p === "networking"){
+    const active = s.channels.filter(c => (c.activities||[]).length || c.leads>0 || (c.subTicks||[]).some(t=>t.done)).length;
+    return active / s.channels.length;
+  }
+  if(p === "team"){
+    return s.members.reduce((a,i)=> a + (i.stage||0)/TEAM_STAGES.length, 0) / s.members.length;
+  }
+  if(p === "marketing"){
+    return s.items.filter(i=>i.done).length / s.items.length;
+  }
+  if(p === "social"){
+    const total = s.items.length * 2;
+    const done = s.items.reduce((a,i)=> a + (i.joined?1:0) + (i.firstSession?1:0), 0);
+    return done / total;
+  }
+  return 0;
+}
+function updateProgress(){
+  let sum = 0;
+  for(const p of PILLARS){
+    const v = pillarProgress(p);
+    sum += v;
+    const f = $(`#fill-${p}`), t = $(`#pct-${p}`);
+    if(f) f.style.width = Math.round(v*100)+"%";
+    if(t) t.textContent = Math.round(v*100)+"%";
+  }
+  const overall = Math.round(sum / PILLARS.length * 100);
+  $("#overallPct").textContent = overall + "%";
+  $("#overallFill").style.width = overall + "%";
+}
+
+/* ---------------- persistence ---------------- */
+function setSync(cls){ const d = $("#syncDot"); d.className = cls || ""; }
+function toast(msg, err){
+  const t = $("#toast");
+  t.textContent = msg; t.className = "show" + (err ? " err" : "");
+  clearTimeout(t._h); t._h = setTimeout(()=> t.className = "", 1400);
+}
+async function save(pillar){
+  if(!user) return;
+  savingCount++; setSync("saving");
+  try{
+    await setDoc(doc(db, COLLECTION, pillar), state[pillar]);
+    savingCount--;
+    if(savingCount<=0){ savingCount=0; setSync(""); }
+    toast("Saved ✓");
+  }catch(e){
+    savingCount--; setSync("error");
+    toast("Save failed — check connection", true);
+    console.error(e);
+  }
+}
+function saveDebounced(pillar){
+  clearTimeout(saveTimers[pillar]);
+  setSync("saving");
+  saveTimers[pillar] = setTimeout(()=> save(pillar), 700);
+}
+function isEditing(){
+  const el = document.activeElement;
+  return el && (el.tagName==="TEXTAREA" || el.tagName==="INPUT" || el.tagName==="SELECT") && $("#main").contains(el);
+}
+function subscribeAll(){
+  for(const p of PILLARS){
+    unsubs.push(onSnapshot(doc(db, COLLECTION, p), snap => {
+      if(snap.metadata.hasPendingWrites) return;         // our own write echoing back
+      const merged = mergePillar(p, snap.exists() ? snap.data() : null);
+      if(isEditing()){ pendingRemote[p] = merged; return; } // don't stomp on typing
+      state[p] = merged;
+      render(p); updateProgress();
+    }, e => { console.error(e); setSync("error"); toast("Sync error — check Firestore rules", true); }));
+  }
+  // apply deferred remote updates once the user stops editing
+  document.addEventListener("focusout", ()=> setTimeout(()=>{
+    if(isEditing()) return;
+    for(const p of Object.keys(pendingRemote)){
+      state[p] = pendingRemote[p]; delete pendingRemote[p];
+      render(p);
+    }
+    updateProgress();
+  }, 60));
+}
+
+/* ---------------- render helpers ---------------- */
+const cardHead = (n, title, p) => `
+  <div class="card-head">
+    <h2><span class="num">${n}</span>${title}</h2>
+    <span class="card-pct" id="pct-${p}">0%</span>
+  </div>
+  <div class="track"><div class="fill" id="fill-${p}"></div></div>`;
+
+const notesBox = (p,id,val) => `
+  <div class="notes"><textarea rows="1" placeholder="Notes…" data-input="notes" data-pillar="${p}" data-id="${id}">${esc(val)}</textarea></div>`;
+
+const stagePills = (p,id,stage,names) => `
+  <div class="stages">${names.map((n,i)=>
+    `<button data-action="stage" data-pillar="${p}" data-id="${id}" data-idx="${i+1}" class="${stage>=i+1?"done":""}">${n}</button>`
+  ).join("")}</div>`;
+
+const counterHTML = (p,id,field,val,lbl) => `
+  <div class="counter-wrap"><span class="clbl">${lbl}</span>
+    <div class="counter">
+      <button data-action="count" data-pillar="${p}" data-id="${id}" data-field="${field}" data-d="-1" aria-label="decrease">−</button>
+      <span class="val">${val||0}</span>
+      <button data-action="count" data-pillar="${p}" data-id="${id}" data-field="${field}" data-d="1" aria-label="increase">+</button>
+    </div>
+  </div>`;
+
+/* ---------------- pillar renderers ---------------- */
+function renderMilestones(){
+  const s = state.milestones;
+  return `<div class="timeline">${s.items.map(m=>{
+    const dot = m.status==="done"?"done":m.status==="prog"?"prog":"";
+    let extra = "";
+    if(m.id==="cash"){
+      const pct = m.target>0 ? Math.min(100, Math.round((m.tally||0)/m.target*100)) : 0;
+      extra = `
+        <div class="field-inline">
+          <label>Cash tally</label>
+          <div class="prefix"><span>$</span><input type="number" inputmode="numeric" min="0" value="${m.tally||0}" data-input="tally" data-pillar="milestones" data-id="cash"></div>
+          <label>Goal</label>
+          <div class="prefix"><span>$</span><input type="number" inputmode="numeric" min="0" value="${m.target||0}" data-input="target" data-pillar="milestones" data-id="cash"></div>
+        </div>
+        ${m.target>0?`<div class="mini-track"><div class="fill" style="width:${pct}%"></div></div>
+        <div class="mini-meta">${fmtMoney(m.tally)} of ${fmtMoney(m.target)} · ${pct}%</div>`:""}`;
+    }
+    if(m.id==="rental"){
+      extra = `
+        <div class="field-inline">
+          <label>Rent buffered</label>
+          <div class="counter">
+            <button data-action="count" data-pillar="milestones" data-id="rental" data-field="bufferMonths" data-d="-1">−</button>
+            <span class="val">${m.bufferMonths||0}</span>
+            <button data-action="count" data-pillar="milestones" data-id="rental" data-field="bufferMonths" data-d="1">+</button>
+          </div>
+          <span style="color:var(--ink2)">/ 6 months</span>
+        </div>
+        <div class="mini-track"><div class="fill" style="width:${Math.min(100,(m.bufferMonths||0)/6*100)}%"></div></div>`;
+    }
+    if(m.id==="licence"){
+      extra = `
+        <div class="field-inline">
+          <label>Next review</label>
+          <input type="date" value="${esc(m.reviewDate||"")}" data-input="reviewDate" data-pillar="milestones" data-id="licence">
+        </div>`;
+    }
+    return `<div class="item"><span class="dot ${dot}"></span>
+      <div class="item-title">${esc(m.title)}</div>
+      ${m.sub?`<div class="item-sub">${esc(m.sub)}</div>`:""}
+      <div class="seg">
+        <button data-action="status" data-pillar="milestones" data-id="${m.id}" data-v="not"  class="${m.status==="not"?"on-not":""}">Not started</button>
+        <button data-action="status" data-pillar="milestones" data-id="${m.id}" data-v="prog" class="${m.status==="prog"?"on-prog":""}">In progress</button>
+        <button data-action="status" data-pillar="milestones" data-id="${m.id}" data-v="done" class="${m.status==="done"?"on-done":""}">Done</button>
+      </div>
+      ${extra}
+      ${notesBox("milestones", m.id, m.notes)}
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function renderSubbies(){
+  const s = state.subbies;
+  const counts = SUBBIE_CHANNELS.map(c=>{
+    const list = s.prospects.filter(x=>x.channel===c.id);
+    return {name:c.name, n:list.length, reliable:list.filter(x=>x.stage>=4).length};
+  });
+  const max = Math.max(1, ...counts.map(c=>c.n));
+  const bars = `<div class="chan-bars">${counts.map(c=>`
+    <div class="chan-bar"><span class="lbl">${c.name}</span>
+      <div class="bar"><i style="width:${c.n/max*100}%"></i></div>
+      <span class="val">${c.n}</span></div>`).join("")}
+  </div>`;
+  const rows = s.prospects.length ? s.prospects.map(x=>{
+    const ch = SUBBIE_CHANNELS.find(c=>c.id===x.channel);
+    return `<div class="item">
+      <div class="item-row"><div>
+        <div class="item-title">${esc(x.name)} ${x.stage>=4?'<span class="badge good">Reliable</span>':""}</div>
+        <div class="meta-line">${esc(x.trade||"—")}${x.phone?` · <a href="tel:${esc(x.phone)}" style="color:var(--accent);font-weight:600;text-decoration:none">${esc(x.phone)}</a>`:""} · <span class="badge">${ch?ch.name:esc(x.channel)}</span></div>
+      </div>
+      <button class="del" data-action="del" data-pillar="subbies" data-id="${x.id}" aria-label="delete">✕</button></div>
+      ${stagePills("subbies", x.id, x.stage||0, SUBBIE_STAGES)}
+      ${notesBox("subbies", x.id, x.notes)}
+    </div>`;
+  }).join("") : `<div class="empty">No subbie prospects yet — add your first below.</div>`;
+  return bars + rows + `
+    <button class="add-btn" data-action="toggle-form" data-form="subbieForm">+ Add subbie prospect</button>
+    <form class="add-form" id="subbieForm">
+      <div class="two"><input type="text" name="name" placeholder="Name" required><input type="tel" name="phone" placeholder="Phone"></div>
+      <div class="two"><input type="text" name="trade" placeholder="Trade">
+        <select name="channel">${SUBBIE_CHANNELS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("")}</select></div>
+      <button class="btn-primary" data-action="add-subbie" type="submit">Add prospect</button>
+    </form>`;
+}
+
+function renderBuilders(){
+  const s = state.builders;
+  const pinned = `<div class="pinned">📌 <b>Positioning:</b> frame it as waiting on my QBCC licence. Goal — one builder partner who takes my qualified jobs direct to homeowners under his insurance.</div>`;
+  const rows = s.prospects.length ? s.prospects.map(x=>`
+    <div class="item">
+      <div class="item-row"><div>
+        <div class="item-title">${esc(x.name)} ${x.stage>=5?'<span class="badge good">Partnered</span>':""}</div>
+        <div class="meta-line">${esc(x.company||"—")}${x.source?` · via ${esc(x.source)}`:""} · HWI:
+          <button class="badge ${x.hwi?"good":""}" data-action="toggle-hwi" data-pillar="builders" data-id="${x.id}" style="cursor:pointer">${x.hwi?"✓ Yes":"No"}</button></div>
+      </div>
+      <button class="del" data-action="del" data-pillar="builders" data-id="${x.id}" aria-label="delete">✕</button></div>
+      ${stagePills("builders", x.id, x.stage||0, BUILDER_STAGES)}
+      ${notesBox("builders", x.id, x.notes)}
+    </div>`).join("") : `<div class="empty">No builder prospects yet — add your first below.</div>`;
+  return pinned + rows + `
+    <button class="add-btn" data-action="toggle-form" data-form="builderForm">+ Add builder prospect</button>
+    <form class="add-form" id="builderForm">
+      <div class="two"><input type="text" name="name" placeholder="Name" required><input type="text" name="company" placeholder="Company"></div>
+      <div class="two"><input type="text" name="source" placeholder="Source (BNI, referral…)">
+        <label class="tick small" style="align-self:center"><input type="checkbox" name="hwi" hidden><span class="box"></span><span class="lbl">Has home warranty insurance</span></label></div>
+      <button class="btn-primary" data-action="add-builder" type="submit">Add builder</button>
+    </form>`;
+}
+
+function renderNetworking(){
+  const s = state.networking;
+  const max = Math.max(1, ...s.channels.map(c=>c.leads||0));
+  const bars = `<div class="meta-line" style="margin-bottom:6px;font-weight:600">Leads per channel</div>
+    <div class="chan-bars">${s.channels.map(c=>`
+      <div class="chan-bar"><span class="lbl">${esc(c.name)}</span>
+        <div class="bar"><i style="width:${(c.leads||0)/max*100}%"></i></div>
+        <span class="val">${c.leads||0}</span></div>`).join("")}
+    </div>`;
+  const rows = s.channels.map(c=>{
+    const acts = (c.activities||[]);
+    return `<div class="item">
+      <div class="item-row"><div>
+        <div class="item-title">${esc(c.name)} <span class="badge">${acts.length} ${acts.length===1?"activity":"activities"}</span></div>
+        ${c.hint?`<div class="item-sub">${esc(c.hint)}</div>`:""}
+      </div></div>
+      ${(c.subTicks||[]).length?`<div class="subticks">${c.subTicks.map((t,i)=>`
+        <button class="tick small ${t.done?"on":""}" data-action="subtick" data-pillar="networking" data-id="${c.id}" data-idx="${i}">
+          <span class="box"></span><span class="lbl">${esc(t.label)}</span></button>`).join("")}</div>`:""}
+      ${acts.length?`<div class="chips">${acts.map((a,i)=>`
+        <span class="chip">${fmtDate(a.date)}${a.label?` · ${esc(a.label)}`:""}
+          <button class="x" data-action="del-activity" data-id="${c.id}" data-idx="${i}" aria-label="remove">✕</button></span>`).join("")}</div>`:""}
+      <div class="add-inline">
+        <input type="date" value="${todayISO()}" id="actDate-${c.id}">
+        <input type="text" placeholder="${esc(c.labelHint||"Label (optional)")}" id="actLabel-${c.id}">
+        <button class="btn-ghost" data-action="log-activity" data-id="${c.id}">＋ Log</button>
+      </div>
+      ${counterHTML("networking", c.id, "leads", c.leads, "Leads generated")}
+      ${notesBox("networking", c.id, c.notes)}
+    </div>`;
+  }).join("");
+  return bars + rows;
+}
+
+function renderTeam(){
+  const s = state.team;
+  return s.members.map(m=>`
+    <div class="item">
+      <div class="item-title">${esc(m.role)} ${m.stage>=4?'<span class="badge good">Locked in</span>':""}</div>
+      ${m.hint?`<div class="item-sub">${esc(m.hint)}</div>`:""}
+      ${m.id!=="lauren"?`<div class="field-inline"><label>Who</label>
+        <input type="text" placeholder="Name once identified" value="${esc(m.name||"")}" data-input="name" data-pillar="team" data-id="${m.id}"></div>`:""}
+      ${stagePills("team", m.id, m.stage||0, TEAM_STAGES)}
+      ${m.id==="lauren"?counterHTML("team","lauren","activity",m.activity,"Prospecting sessions")+counterHTML("team","lauren","leadsBooked",m.leadsBooked,"Leads booked (new area)"):""}
+      ${notesBox("team", m.id, m.notes)}
+    </div>`).join("");
+}
+
+function renderMarketing(){
+  const s = state.marketing;
+  return s.items.map(i=>`
+    <div class="item">
+      <button class="tick ${i.done?"on":""}" data-action="mtick" data-id="${i.id}">
+        <span class="box"></span><span class="lbl">${esc(i.title)}</span></button>
+      ${notesBox("marketing", i.id, i.notes)}
+    </div>`).join("");
+}
+
+function renderSocial(){
+  const s = state.social;
+  return s.items.map(i=>`
+    <div class="item">
+      <div class="item-title">${esc(i.title)}</div>
+      ${i.sub?`<div class="item-sub">${esc(i.sub)}</div>`:""}
+      <div class="field-inline"><label>Target join date</label>
+        <input type="date" value="${esc(i.targetDate||"")}" data-input="targetDate" data-pillar="social" data-id="${i.id}"></div>
+      <div class="subticks">
+        <button class="tick small ${i.joined?"on":""}" data-action="stick" data-id="${i.id}" data-field="joined">
+          <span class="box"></span><span class="lbl">Joined / signed up</span></button>
+        <button class="tick small ${i.firstSession?"on":""}" data-action="stick" data-id="${i.id}" data-field="firstSession">
+          <span class="box"></span><span class="lbl">First session done</span></button>
+      </div>
+      ${notesBox("social", i.id, i.notes)}
+    </div>`).join("");
+}
+
+const RENDERERS = {
+  milestones: {n:1, title:"Milestones", fn:renderMilestones},
+  subbies:    {n:2, title:"Subcontractor prospecting", fn:renderSubbies},
+  builders:   {n:3, title:"Builder pipeline", fn:renderBuilders},
+  networking: {n:4, title:"Networking & outreach", fn:renderNetworking},
+  team:       {n:5, title:"Team recruitment", fn:renderTeam},
+  marketing:  {n:6, title:"Marketing setup", fn:renderMarketing},
+  social:     {n:7, title:"Social foundations", fn:renderSocial},
+};
+
+function render(pillar){
+  let card = $(`#card-${pillar}`);
+  if(!card){
+    card = document.createElement("section");
+    card.className = "card"; card.id = `card-${pillar}`;
+    $("#main").appendChild(card);
+  }
+  const r = RENDERERS[pillar];
+  card.innerHTML = cardHead(r.n, r.title, pillar) + r.fn();
+  card.querySelectorAll("textarea").forEach(autoGrow);
+}
+function renderAll(){
+  $("#main").innerHTML = "";
+  for(const p of PILLARS) render(p);
+  updateProgress();
+}
+function autoGrow(t){ t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
+
+/* ---------------- events ---------------- */
+function findItem(pillar, id){
+  const s = state[pillar];
+  const list = s.items || s.prospects || s.channels || s.members;
+  return list.find(x => x.id === id);
+}
+
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-action]");
+  if(!btn) return;
+  const a = btn.dataset.action;
+  const pillar = btn.dataset.pillar, id = btn.dataset.id;
+
+  if(a === "toggle-form"){ e.preventDefault(); $("#"+btn.dataset.form).classList.toggle("open"); return; }
+
+  if(a === "add-subbie" || a === "add-builder"){
+    e.preventDefault();
+    const form = btn.closest("form");
+    const f = new FormData(form);
+    if(!String(f.get("name")||"").trim()) { form.querySelector("[name=name]").focus(); return; }
+    if(a === "add-subbie"){
+      state.subbies.prospects.push({id:uid(), name:f.get("name").trim(), phone:String(f.get("phone")||"").trim(),
+        trade:String(f.get("trade")||"").trim(), channel:f.get("channel"), stage:0, notes:""});
+      save("subbies"); render("subbies");
+    }else{
+      state.builders.prospects.push({id:uid(), name:f.get("name").trim(), company:String(f.get("company")||"").trim(),
+        source:String(f.get("source")||"").trim(), hwi:form.querySelector("[name=hwi]").checked, stage:0, notes:""});
+      save("builders"); render("builders");
+    }
+    updateProgress(); return;
+  }
+
+  if(a === "del"){
+    const it = findItem(pillar, id);
+    if(!confirm(`Delete "${it?.name || "this item"}"?`)) return;
+    const s = state[pillar];
+    s.prospects = s.prospects.filter(x=>x.id!==id);
+    save(pillar); render(pillar); updateProgress(); return;
+  }
+
+  if(a === "status"){
+    findItem("milestones", id).status = btn.dataset.v;
+    save("milestones"); render("milestones"); updateProgress(); return;
+  }
+
+  if(a === "stage"){
+    const it = findItem(pillar, id);
+    const idx = +btn.dataset.idx;
+    it.stage = (it.stage === idx) ? idx - 1 : idx;   // tap current stage to step back
+    save(pillar); render(pillar); updateProgress(); return;
+  }
+
+  if(a === "count"){
+    const it = findItem(pillar, id);
+    const f = btn.dataset.field;
+    it[f] = Math.max(0, (it[f]||0) + (+btn.dataset.d));
+    save(pillar); render(pillar); updateProgress(); return;
+  }
+
+  if(a === "toggle-hwi"){
+    const it = findItem("builders", id);
+    it.hwi = !it.hwi;
+    save("builders"); render("builders"); return;
+  }
+
+  if(a === "subtick"){
+    const it = findItem("networking", id);
+    it.subTicks[+btn.dataset.idx].done = !it.subTicks[+btn.dataset.idx].done;
+    save("networking"); render("networking"); updateProgress(); return;
+  }
+
+  if(a === "log-activity"){
+    e.preventDefault();
+    const it = findItem("networking", id);
+    const date = $(`#actDate-${id}`).value || todayISO();
+    const label = $(`#actLabel-${id}`).value.trim();
+    it.activities = it.activities || [];
+    it.activities.push({date, label});
+    save("networking"); render("networking"); updateProgress(); return;
+  }
+
+  if(a === "del-activity"){
+    const it = findItem("networking", btn.dataset.id);
+    it.activities.splice(+btn.dataset.idx, 1);
+    save("networking"); render("networking"); updateProgress(); return;
+  }
+
+  if(a === "mtick"){
+    const it = findItem("marketing", id);
+    it.done = !it.done;
+    save("marketing"); render("marketing"); updateProgress(); return;
+  }
+
+  if(a === "stick"){
+    const it = findItem("social", id);
+    it[btn.dataset.field] = !it[btn.dataset.field];
+    save("social"); render("social"); updateProgress(); return;
+  }
+});
+
+document.addEventListener("input", e => {
+  const el = e.target;
+  if(el.tagName === "TEXTAREA") autoGrow(el);
+  const field = el.dataset.input;
+  if(!field) return;
+  const it = findItem(el.dataset.pillar, el.dataset.id);
+  if(!it) return;
+  if(field === "tally" || field === "target"){
+    it[field] = Math.max(0, Number(el.value) || 0);
+    // live-update the cash mini bar without a re-render (keeps focus)
+    const m = it;
+    const wrap = el.closest(".item");
+    const bar = wrap.querySelector(".mini-track .fill"), meta = wrap.querySelector(".mini-meta");
+    if(bar && m.target>0){
+      const pct = Math.min(100, Math.round((m.tally||0)/m.target*100));
+      bar.style.width = pct+"%";
+      if(meta) meta.textContent = `${fmtMoney(m.tally)} of ${fmtMoney(m.target)} · ${pct}%`;
+    }
+  } else {
+    it[field] = el.value;
+  }
+  saveDebounced(el.dataset.pillar);
+});
+
+/* label-wrapped checkbox in builder add-form (visual only) */
+document.addEventListener("change", e => {
+  const cb = e.target.closest(".add-form .tick input[type=checkbox]");
+  if(cb) cb.closest(".tick").classList.toggle("on", cb.checked);
+});
+
+/* ---------------- auth + boot ---------------- */
+function boot(){
+  if(firebaseConfig.apiKey.startsWith("PASTE")){
+    $("#setupNotice").style.display = "block";
+    $("#loginBtn").disabled = true;
+    return;
+  }
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+
+  onAuthStateChanged(auth, u => {
+    user = u;
+    if(u){
+      $("#loginScreen").style.display = "none";
+      $("#app").style.display = "block";
+      state = {}; for(const p of PILLARS) state[p] = mergePillar(p, null);
+      renderAll();
+      subscribeAll();
+    }else{
+      unsubs.forEach(fn=>fn()); unsubs.length = 0;
+      $("#app").style.display = "none";
+      $("#loginScreen").style.display = "flex";
+    }
+  });
+
+  $("#loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const btn = $("#loginBtn"), err = $("#loginError");
+    btn.disabled = true; btn.textContent = "Signing in…"; err.style.display = "none";
+    try{
+      await signInWithEmailAndPassword(auth, $("#loginEmail").value.trim(), $("#loginPassword").value);
+    }catch(ex){
+      err.textContent = ex.code === "auth/invalid-credential" || ex.code === "auth/wrong-password" || ex.code === "auth/user-not-found"
+        ? "Wrong email or password." : "Sign-in failed: " + (ex.code || ex.message);
+      err.style.display = "block";
+    }
+    btn.disabled = false; btn.textContent = "Sign in";
+  });
+
+  $("#signOutBtn").addEventListener("click", ()=> signOut(auth));
+}
+boot();
+</script>
+</body>
+</html>
